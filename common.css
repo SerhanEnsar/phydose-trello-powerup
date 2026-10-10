@@ -1,0 +1,17 @@
+body { margin: 0; padding: 4px 2px; font-size: 14px; }
+.types { display: grid; gap: 6px; margin: 6px 0 10px; }
+.type {
+  display: flex; gap: 10px; align-items: center; width: 100%; text-align: left;
+  padding: 8px 10px; border-radius: 6px; border: 2px solid transparent;
+  background: rgba(9, 30, 66, .06); cursor: pointer; margin: 0;
+}
+.type:hover { background: rgba(9, 30, 66, .12); }
+.type.selected { border-color: #0c66e4; background: rgba(12, 102, 228, .10); }
+.type .emoji { font-size: 20px; width: 26px; text-align: center; }
+.type b { display: block; }
+.type small { opacity: .7; }
+.msg { margin: 8px 0; padding: 8px; border-radius: 6px; background: rgba(9, 30, 66, .06); }
+.msg.err { background: #ffeceb; color: #ae2e24; }
+label { font-weight: 600; margin-top: 6px; display: block; }
+input[type=text], select { width: 100%; box-sizing: border-box; }
+.hidden { display: none; }

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <link rel="stylesheet" href="./common.css?v=3">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./templates.js?v=3"></script>
+  <script src="./ui.js?v=3"></script>
+</head>
+<body>
+  <div id="auth" class="hidden">
+    <p>Kartı otomatik doldurabilmem için bir kereliğine izin vermen gerekiyor.</p>
+    <button id="authBtn" class="mod-primary">🔑 İzin ver</button>
+  </div>
+  <div id="main">
+    <p>Bu kart ne tür bir iş? Seçince açıklama ve <b>Bitti mi?</b> listesi otomatik eklenir.</p>
+    <div class="types" id="types"></div>
+  </div>
+  <div id="msg" class="hidden"></div>
+  <script>
+    requireAuth(function () {
+      renderTypes(document.getElementById('types'), function (type) {
+        msg('Uygulanıyor…');
+        t.card('id', 'desc').then(function (c) {
+          return phydoseApplyType(t, c.id, type, c.desc);
+        }).then(function () {
+          t.closePopup();
+        }).catch(function (e) {
+          msg('Bir sorun oldu: ' + e.message, true);
+        });
+      });
+      t.sizeTo('body');
+    });
+  </script>
+</body>
+</html>

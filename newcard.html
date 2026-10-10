@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <link rel="stylesheet" href="./common.css?v=3">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./templates.js?v=3"></script>
+  <script src="./ui.js?v=3"></script>
+</head>
+<body>
+  <div id="auth" class="hidden">
+    <p>Kart oluşturabilmem için bir kereliğine izin vermen gerekiyor.</p>
+    <button id="authBtn" class="mod-primary">🔑 İzin ver</button>
+  </div>
+  <form id="main">
+    <label for="title">1. Kartın adı</label>
+    <input id="title" type="text" placeholder="örn. DICOM dosyalarını HU'ya çevir" autofocus>
+
+    <label>2. Türü</label>
+    <div class="types" id="types"></div>
+
+    <label for="list">3. Hangi listeye?</label>
+    <select id="list"></select>
+
+    <button type="submit" class="mod-primary">Kartı oluştur</button>
+  </form>
+  <div id="msg" class="hidden"></div>
+  <script>
+    var picked = null;
+    requireAuth(function () {
+      renderTypes(document.getElementById('types'), function (type) { picked = type; });
+
+      t.lists('id', 'name').then(function (lists) {
+        var sel = document.getElementById('list');
+        lists.filter(function (l) { return !/bilgi/i.test(l.name); }).forEach(function (l) {
+          var o = document.createElement('option');
+          o.value = l.id; o.textContent = l.name;
+          sel.appendChild(o);
+        });
+        t.sizeTo('body');
+      });
+
+      document.getElementById('main').onsubmit = function (e) {
+        e.preventDefault();
+        var title = document.getElementById('title').value.trim();
+        if (!title) return msg('Kartın adını yaz.', true);
+        if (!picked) return msg('Bir tür seç.', true);
+        msg('Oluşturuluyor…');
+        t.getRestApi().getToken().then(function (token) {
+          return phydoseCaller(token)('POST', '/cards', {
+            idList: document.getElementById('list').value, name: title, pos: 'top'
+          });
+        }).then(function (card) {
+          return phydoseApplyType(t, card.id, picked, '').then(function () {
+            return t.showCard(card.id);
+          });
+        }).then(function () {
+          t.closePopup();
+        }).catch(function (err) {
+          msg('Bir sorun oldu: ' + err.message, true);
+        });
+      };
+    });
+  </script>
+</body>
+</html>
