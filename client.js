@@ -64,13 +64,41 @@ function openSettings(t) {
   return t.popup({ title: 'PhyDose ayarları', url: BASE + 'settings.html', height: 230 });
 }
 
+function openMetrics(t) {
+  return t.popup({ title: 'Deney metrikleri', url: BASE + 'metrics.html', height: 280 });
+}
+
 TrelloPowerUp.initialize({
   'card-badges': function (t) {
     return loadCardState(t).then(function (s) { return buildBadges(s, false); });
   },
 
+  // Kart detayındaki rozetler tıklanabilir: yeni Trello arayüzünde kart butonları
+  // "+ Add" menüsünde gizli kaldığı için eylemler burada da sunulur.
   'card-detail-badges': function (t) {
-    return loadCardState(t).then(function (s) { return buildBadges(s, true); });
+    return Promise.all([
+      loadCardState(t),
+      t.get('board', 'shared', 'repo', ''),
+      t.get('board', 'shared', 'branch', 'main')
+    ]).then(function (r) {
+      var s = r[0], repo = (r[1] || '').replace(/\/+$/, '');
+      var badges = buildBadges(s, true);
+      var info = parseCode(s.card.name);
+      if (!info) return badges;
+
+      if (info.kind === 'exp') {
+        badges.push({
+          title: 'Metrikler',
+          text: s.metrics ? '✏️ Düzenle' : '📊 Metrik gir',
+          color: 'sky',
+          callback: openMetrics
+        });
+      }
+      badges.push(repo
+        ? { title: 'Repo', text: "📂 Repo'da aç", url: repo + '/' + repoPath(info).replace('{b}', r[2] || 'main') }
+        : { title: 'Repo', text: "📂 Repo'yu ayarla", callback: openSettings });
+      return badges;
+    });
   },
 
   'card-buttons': function (t) {
@@ -96,13 +124,7 @@ TrelloPowerUp.initialize({
         }
       }
       if (info && info.kind === 'exp') {
-        buttons.push({
-          icon: ICON,
-          text: '📊 Metrik gir',
-          callback: function (t) {
-            return t.popup({ title: 'Deney metrikleri', url: BASE + 'metrics.html', height: 280 });
-          }
-        });
+        buttons.push({ icon: ICON, text: '📊 Metrik gir', callback: openMetrics });
       }
       return buttons;
     });
