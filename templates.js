@@ -99,9 +99,10 @@ function phydoseApplyType(t, cardId, type, existingDesc) {
 function phydoseCaller(token) {
   var auth = 'key=' + encodeURIComponent(PHYDOSE_APP_KEY) + '&token=' + encodeURIComponent(token);
   return function (method, path, params) {
-    return fetch('https://api.trello.com/1' + path + '?' + auth, {
-      method: method, body: new URLSearchParams(params || {})
-    }).then(function (res) {
+    var url = 'https://api.trello.com/1' + path + (path.indexOf('?') < 0 ? '?' : '&') + auth;
+    var opts = { method: method };
+    if (method !== 'GET') opts.body = new URLSearchParams(params || {});
+    return fetch(url, opts).then(function (res) {
       if (!res.ok) throw new Error(method + ' ' + path + ' → ' + res.status);
       return res.json();
     });

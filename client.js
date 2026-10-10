@@ -7,7 +7,7 @@
  */
 var BASE = new URL('./', window.location.href).href;
 var ICON = BASE + 'icon.svg';
-var V = '?v=3';
+var V = '?v=4';
 var DONE_LIST = /bitti/i;
 var INFO_LIST = /bilgi/i;
 
