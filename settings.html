@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <form id="f">
+    <label for="repo">GitHub repo adresi</label>
+    <input id="repo" type="url" placeholder="https://github.com/kullanici/phydose-ct">
+    <label for="branch">Branch</label>
+    <input id="branch" type="text" placeholder="main">
+    <button type="submit" class="mod-primary">Kaydet</button>
+  </form>
+  <script>
+    var t = TrelloPowerUp.iframe();
+    var repo = document.getElementById('repo');
+    var branch = document.getElementById('branch');
+
+    Promise.all([t.get('board', 'shared', 'repo', ''), t.get('board', 'shared', 'branch', 'main')])
+      .then(function (r) { repo.value = r[0]; branch.value = r[1]; });
+
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      t.set('board', 'shared', { repo: repo.value.trim(), branch: branch.value.trim() || 'main' })
+        .then(function () { t.closePopup(); });
+    });
+    t.render(function () { t.sizeTo('#f'); });
+  </script>
+</body>
+</html>

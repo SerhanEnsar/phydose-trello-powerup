@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <form id="f">
+    <p>Yalnızca gerçekten ölçülmüş değerleri girin. Boş bırakılan alan rozet olarak gösterilmez.</p>
+    <label for="psnr">PSNR (dB)</label>
+    <input id="psnr" type="number" step="any" placeholder="örn. 34.2">
+    <label for="ssim">SSIM (0–1)</label>
+    <input id="ssim" type="number" step="any" min="0" max="1" placeholder="örn. 0.912">
+    <label for="dhu">ΔHU (ortalama mutlak, HU)</label>
+    <input id="dhu" type="number" step="any" placeholder="örn. 3.1">
+    <button type="submit" class="mod-primary">Kaydet</button>
+    <button type="button" id="clear">Temizle</button>
+  </form>
+  <script>
+    var t = TrelloPowerUp.iframe();
+    var keys = ['psnr', 'ssim', 'dhu'];
+
+    t.get('card', 'shared', 'metrics', {}).then(function (m) {
+      keys.forEach(function (k) { document.getElementById(k).value = (m && m[k]) || ''; });
+    });
+
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var m = {};
+      keys.forEach(function (k) {
+        var v = document.getElementById(k).value.trim();
+        if (v !== '') m[k] = v;
+      });
+      t.set('card', 'shared', 'metrics', m).then(function () { t.closePopup(); });
+    });
+
+    document.getElementById('clear').addEventListener('click', function () {
+      t.remove('card', 'shared', 'metrics').then(function () { t.closePopup(); });
+    });
+    t.render(function () { t.sizeTo('#f'); });
+  </script>
+</body>
+</html>
